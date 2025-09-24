@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Do you love me?</title>
+  <style>
+    :root{--bg:#100620;--card:#fff;--accent:#ff5370}
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; background:var(--bg); color:var(--card); display:flex; align-items:center; justify-content:center; min-height:100vh;}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02)); padding:28px; border-radius:14px; width:min(680px,92%); text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+    h1{margin:0 0 8px; font-size:28px; color:#ffdbe6}
+    p.lead{margin:0 0 18px; color:#ffd0e0}
+    .buttons{display:flex; gap:12px; justify-content:center; margin-top:6px}
+    button{padding:10px 16px; border-radius:10px; border:none; font-weight:600; cursor:pointer; transition:transform .12s ease; box-shadow:0 6px 18px rgba(0,0,0,0.35)}
+    button:active{transform:translateY(2px)}
+    .btn-yes{background:linear-gradient(90deg,#ff9aa2,#ff6b9f); color:white}
+    .btn-no{background:linear-gradient(90deg,#7a7bff,#6fd3ff); color:#051232}
+    #message{margin-top:18px; min-height:58px}
+    #cute{margin-top:18px; background:rgba(255,255,255,0.04); padding:12px; border-radius:10px; display:none; color:#fff; line-height:1.4}
+    #apology{display:none; margin-top:18px; color:#f0c0d0}
+    canvas#fw{position:fixed; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:20; display:none}
+    .small{font-size:.85rem; color:#ffdbe6; margin-top:8px}
+    footer{font-size:.78rem; color:#cfc; margin-top:14px}
+  </style>
+</head>
+<body>
+  <canvas id="fw"></canvas>
+  <div class="card" role="dialog" aria-labelledby="q">
+    <h1 id="q">Do you love me?</h1>
+    <p class="lead">Tell me honestly — it's okay either way 💫</p>
+
+    <div class="buttons" id="controls">
+      <button class="btn-yes" id="yesBtn">Yes ❤️</button>
+      <button class="btn-no" id="noBtn">No 💔</button>
+    </div>
+
+    <div id="message" aria-live="polite"></div>
+    <div id="cute" aria-hidden="true">
+      <h3>Fireworks for you 🎆</h3>
+      <p>Every little moment with you becomes a memory I keep warm in my heart. Thank you for bei
