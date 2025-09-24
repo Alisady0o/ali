@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>❤️ Our Romantic Quiz</title>
+  <style>
+    body {font-family: "Segoe UI", Arial, sans-serif; margin:0; background:#fff0f5; color:#333;}
+    header {background:linear-gradient(135deg,#ff9aa2,#ffb7b2); padding:30px; text-align:center; color:white;}
+    h1 {margin:0; font-size:2rem;}
+    .container {max-width:800px; margin:20px auto; padding:16px;}
+    .q {background:#fff; margin:12px 0; padding:16px; border-radius:10px;
+        box-shadow:0 3px 6px rgba(0,0,0,0.05); animation:fadeIn .8s;}
+    textarea, input {width:100%; padding:10px; margin-top:8px;
+        border-radius:8px; border:1px solid #ddd; resize:vertical;}
+    button {background:#e75480; color:white; border:none; padding:10px 16px;
+        border-radius:8px; margin-top:10px; cursor:pointer;}
+    button:hover {background:#d43f68;}
+    .actions {display:flex; gap:10px; flex-wrap:wrap;}
+    .result {margin-top:20px; padding:15px; background:#fff7fb;
+        border-left:4px solid #ff7fa2; border-radius:6px; white-space:pre-line;}
+    footer {text-align:center; margin:30px 0; font-size:.9rem; color:#666;}
+    #qrCanvas {margin-top:15px;}
+    @keyframes fadeIn {from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:translateY(0);}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>💌 Sweet Questions for You</h1>
+  <p>Answer with love, then scan & share.</p>
+</header>
+
+<div class="container">
+  <form id="quiz">
+    <div class="q"><label>1. If our love were a song, what would the title be?</label><textarea name="q1"></textarea></div>
+    <div class="q"><label>2. What tiny habit of mine makes your heart melt?</label><textarea name="q2"></textarea></div>
+    <div class="q"><label>3. Where would you dream of us escaping for one magical weekend?</label><textarea name="q3"></textarea></div>
+    <div class="q"><label>4. What’s the sweetest memory you keep replaying of us?</label><textarea name="q4"></textarea></div>
+    <div class="q"><label>5. If I could surprise you tomorrow, what should I do?</label><textarea name="q5"></textarea></div>
+    <div class="q"><label>6. Which words from me always make you feel safe?</label><textarea name="q6"></textarea></div>
+    <div class="q"><label>7. If we wrote a love story together, what would the first line be?</label><textarea name="q7"></textarea></div>
+    <div class="q"><label>8. What’s one little thing I do that you never want me to stop?</label><textarea name="q8"></textarea></div>
+    <div class="q"><label>9. What’s a promise you’d like us to make to each other today?</label><textarea name="q9"></textarea></div>
+    <div class="q"><label>10. If you could send me one message right now, what would it say?</label><textarea name="q10"></textarea></div>
+
+    <div class="actions">
+      <button type="button" id="preview">Preview</button>
+      <button type="button" id="download">Download Answers</button>
+      <button type="reset">Clear</button>
+    </div>
+  </form>
+
+  <div id="result" class="result" style="display:none"></div>
+
+  <hr>
+  <h2>📱 Generate Your QR Code</h2>
+  <p>Enter the hosted URL of this page after you upload it:</p>
+  <input type="text" id="urlInput" placeholder="https://yourname.github.io/romantic-quiz.html">
+  <button type="button" id="makeQR">Make QR</button>
+  <canvas id="qrCanvas"></canvas>
+</div>
+
+<footer>
+  Made with ❤️ just for us
+</footer>
+
+<!-- QR library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+  const form = document.getElementById('quiz');
+  const result = document.getElementById('result');
+
+  function collectAnswers() {
+    const data = new FormData(form);
+    let out = "💖 Our Romantic Quiz Answers 💖\n\n";
+    let i = 1;
+    for (const val of data.values()) {
+      out += (i++) + ". " + (val.trim() || "[no answer]") + "\n\n";
+    }
+    return out;
+  }
+
+  document.getElementById('preview').onclick = () => {
+    result.style.display = 'block';
+    result.textContent = collectAnswers();
+  };
+
+  document.getElementById('download').onclick = () => {
+    const blob = new Blob([collectAnswers()], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'romantic-answers.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  // QR code generation
+  document.getElementById('makeQR').onclick = () => {
+    const url = document.getElementById('urlInput').value.trim();
+    if (!url) return alert("Please enter your hosted page URL first!");
+    const qr = qrcode(0, 'M');
+    qr.addData(url);
+    qr.make();
+    const canvas = document.getElementById('qrCanvas');
+    const ctx = canvas.getContext('2d');
+    const tileW = 6;
+    const size = qr.getModuleCount() * tileW;
+    canvas.width = canvas.height = size;
+    for (let row=0; row<qr.getModuleCount(); row++) {
+      for (let col=0; col<qr.getModuleCount(); col++) {
+        ctx.fillStyle = qr.isDark(row,col) ? "#000" : "#fff";
+        ctx.fillRect(col*tileW,row*tileW,tileW,tileW);
+      }
+    }
+  };
+</script>
+</body>
+</html>
