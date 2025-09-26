@@ -39,3 +39,170 @@
     <div id="cute" aria-hidden="true">
       <h3>Fireworks for you 🎆</h3>
       <p>Every little moment with you becomes a memory I keep warm in my heart. Thank you for bei
+<script>
+/* Interaction logic */
+const yesBtn = document.getElementById('yesBtn');
+const noBtn = document.getElementById('noBtn');
+const message = document.getElementById('message');
+const cute = document.getElementById('cute');
+const apology = document.getElementById('apology');
+const fwCanvas = document.getElementById('fw');
+
+let noCount = 0;
+let answered = false;
+
+yesBtn.addEventListener('click', ()=> {
+  if (answered) return;
+  answered = true;
+  message.textContent = "Yay! 💖 Celebrating you...";
+  launchFireworks();            // start fireworks
+  setTimeout(()=> {
+    showCuteParagraph();
+  }, 600); // allow a little time for fireworks to start
+  disableButtons();
+});
+
+noBtn.addEventListener('click', ()=> {
+  if (answered) return;
+  noCount++;
+  if (noCount === 1) {
+    message.textContent = "Oh… are you sure? (Try again)";
+  } else if (noCount === 2) {
+    message.textContent = "Still no? One more time?";
+  } else {
+    message.textContent = "Okay — I respect your answer.";
+    apology.style.display = 'block';
+    disableButtons();
+    answered = true;
+  }
+});
+
+/* disable both buttons */
+function disableButtons(){
+  yesBtn.disabled = true;
+  noBtn.disabled = true;
+  yesBtn.style.opacity = noBtn.style.opacity = 0.7;
+}
+
+/* reveal paragraph */
+function showCuteParagraph(){
+  cute.style.display = 'block';
+  cute.setAttribute('aria-hidden','false');
+  // gentle scroll into view if needed
+  cute.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* ---------------------------
+   Fireworks canvas effect
+   --------------------------- */
+(() => {
+  const canvas = fwCanvas;
+  const ctx = canvas.getContext('2d');
+  let W = canvas.width = innerWidth;
+  let H = canvas.height = innerHeight;
+  let particles = [];
+  let fireworks = [];
+  let animId = null;
+  let running = false;
+
+  window.addEventListener('resize', ()=> {
+    W = canvas.width = innerWidth;
+    H = canvas.height = innerHeight;
+  });
+
+  // particle constructor
+  function Particle(x,y, vx, vy, color, life){
+    this.x = x; this.y = y;
+    this.vx = vx; this.vy = vy;
+    this.alpha = 1;
+    this.color = color;
+    this.life = life || 80;
+    this.size = Math.random()*2 + 1;
+  }
+  Particle.prototype.update = function(){
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vy += 0.02; // gravity
+    this.vx *= 0.99;
+    this.vy *= 0.99;
+    this.alpha -= 1/this.life;
+    this.size *= 0.995;
+  }
+  Particle.prototype.draw = function(){
+    ctx.globalAlpha = Math.max(this.alpha,0);
+    ctx.beginPath();
+    ctx.fillStyle = this.color;
+    ctx.arc(this.x, this.y, Math.max(this.size,0.5), 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // create an explosion at x,y
+  function explode(x,y, hue, count){
+    count = count || 80;
+    for (let i=0;i<count;i++){
+      const angle = Math.random()*Math.PI*2;
+      const speed = Math.random()*5 + 1.5;
+      const vx = Math.cos(angle)*speed;
+      const vy = Math.sin(angle)*speed;
+      const color = `hsl(${(hue + Math.random()*50 - 25)|0}, 85%, 60%)`;
+      particles.push(new Particle(x,y,vx,vy,color, 60 + Math.random()*40));
+    }
+  }
+
+  // launch fireworks: create rockets that explode mid-air
+  function start() {
+    if (running) return;
+    running = true;
+    canvas.style.display = 'block';
+    loop();
+    // orchestrate repeated bursts for a few seconds
+    const bursts = 6;
+    let i = 0;
+    const interval = setInterval(()=> {
+      // random position across top half
+      const x = Math.random()*(W*0.8) + W*0.1;
+      const y = Math.random()*(H*0.45) + H*0.1;
+      const hue = Math.random()*360;
+      explode(x,y,hue, 60 + Math.floor(Math.random()*80));
+      i++;
+      if (i >= bursts) {
+        clearInterval(interval);
+        // let particles fade naturally, then stop canvas display
+        setTimeout(()=> stop(), 3000);
+      }
+    }, 450);
+  }
+
+  function stop(){
+    // stop when no particles left
+    const t = setInterval(()=>{
+      if (particles.length === 0) {
+        running = false;
+        cancelAnimationFrame(animId);
+        ctx.clearRect(0,0,W,H);
+        canvas.style.display = 'none';
+        clearInterval(t);
+      }
+    }, 200);
+  }
+
+  function loop(){
+    animId = requestAnimationFrame(loop);
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = particles.length-1; i >= 0; i--){
+      const p = particles[i];
+      p.update();
+      p.draw();
+      if (p.alpha <= 0 || p.size <= 0.3) particles.splice(i,1);
+    }
+  }
+
+  // expose
+  window.launchFireworks = () => { start(); };
+})();
+</script>
+</body>
+</html>
