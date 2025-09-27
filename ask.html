@@ -6,7 +6,6 @@ How to use:
 3) Open locally in a browser (double-click) or serve with `python -m http.server` and visit http://localhost:8000.
 4) To publish: push to GitHub Pages / Netlify / Vercel (quick steps are included below this file).
 
-
 Features included:
 - Fullscreen romantic layout
 - "Yes" and "No" buttons (Yes triggers fireworks/confetti + final message)
@@ -14,64 +13,293 @@ Features included:
 - Playable background music (optional)
 - Playful runaway "No" button behavior
 
-
 If you want me to customize it with your girlfriend's name, photos, and the exact proposal text, paste them in the chat and I'll update the file for you.
 -->
-
 
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>For Someone Special</title>
-<style>
-:root{
---main-accent: #ff5c8a; /* change in CONFIG */
---bg1: #0f0c29;
---bg2: #302b63;
---glass: rgba(255,255,255,0.06);
---card-radius: 18px;
---max-width: 900px;
---soft-shadow: 0 8px 30px rgba(0,0,0,0.45);
-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-}
-html,body{height:100%;margin:0}
-body{
-display:flex;align-items:center;justify-content:center;
-background: linear-gradient(135deg,var(--bg1),var(--bg2));
-color: white;
--webkit-font-smoothing:antialiased;
-text-rendering:optimizeLegibility;
-overflow:hidden;
-}
-/* subtle animated hearts background */
-.hearts{position:fixed;inset:0;pointer-events:none;opacity:0.18}
-.heart{position:absolute;width:18px;height:18px;background:var(--main-accent);transform:rotate(45deg);border-radius:4px}
-.heart:after,.heart:before{content:"";position:absolute;background:var(--main-accent);width:18px;height:18px;border-radius:50%}
-.heart:before{top:-9px;left:0}
-.heart:after{left:9px;top:0}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>For Someone Special</title>
+  <style>
+    :root{
+      --main-accent: #ff5c8a; /* change in CONFIG */
+      --bg1: #0f0c29;
+      --bg2: #302b63;
+      --glass: rgba(255,255,255,0.06);
+      --card-radius: 18px;
+      --max-width: 900px;
+      --soft-shadow: 0 8px 30px rgba(0,0,0,0.45);
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    html,body{height:100%;margin:0}
+    body{
+      display:flex;align-items:center;justify-content:center;
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      color: white;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+      overflow:hidden;
+    }
+    /* subtle animated hearts background */
+    .hearts{position:fixed;inset:0;pointer-events:none;opacity:0.18}
+    .heart{position:absolute;width:18px;height:18px;background:var(--main-accent);transform:rotate(45deg);border-radius:4px}
+    .heart:after,.heart:before{content:"";position:absolute;background:var(--main-accent);width:18px;height:18px;border-radius:50%}
+    .heart:before{top:-9px;left:0}
+    .heart:after{left:9px;top:0}
 
+    .card{
+      width:min(92%,var(--max-width));
+      background: linear-gradient( to bottom right, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border-radius:var(--card-radius);
+      padding:32px;
+      box-shadow:var(--soft-shadow);
+      backdrop-filter: blur(6px) saturate(120%);
+      text-align:center;
+      position:relative;
+      z-index:50;
+    }
+    h1{font-size:clamp(26px,4.2vw,48px);margin:6px 0}
+    p.lead{opacity:0.95;margin:8px 0 20px}
+    #buttons{display:flex;gap:14px;justify-content:center}
+    button.btn{
+      appearance:none;border:0;padding:12px 22px;border-radius:12px;font-weight:600;cursor:pointer;font-size:16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+      transition:transform .18s ease, box-shadow .18s ease;
+    }
+    button.btn:active{transform:translateY(2px)}
+    #yesBtn{background:linear-gradient(90deg,var(--main-accent),#ff8fb2);color:white}
+    #noBtn{background:transparent;border:1px solid rgba(255,255,255,0.12);color:white}
 
-.card{
-width:min(92%,var(--max-width));
-background: linear-gradient( to bottom right, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-border-radius:var(--card-radius);
-padding:32px;
-box-shadow:var(--soft-shadow);
-backdrop-filter: blur(6px) saturate(120%);
-text-align:center;
-position:relative;
-z-index:50;
-}
-h1{font-size:clamp(26px,4.2vw,48px);margin:6px 0}
-p.lead{opacity:0.95;margin:8px 0 20px}
-#buttons{display:flex;gap:14px;justify-content:center}
-button.btn{
-appearance:none;border:0;padding:12px 22px;border-radius:12px;font-weight:600;cursor:pointer;font-size:16px;
-box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-transition:transform .18s ease, box-shadow .18s ease;
-}
-button.btn:active{transform:translateY(2px)}
-#yesBtn{background:linear-gradient(90deg,var(--main-accent),#ff8fb2);color:white}
+    .final{margin-top:18px;font-size:18px;line-height:1.45;min-height:72px}
+    .hidden{display:none}
+
+    /* small footer note */
+    .note{margin-top:14px;opacity:0.7;font-size:13px}
+
+    /* Canvas for fireworks sits behind content */
+    canvas#fx{position:fixed;inset:0;z-index:30;pointer-events:none}
+
+    /* playful effect for No button to run away */
+    .nolook{position:relative}
+
+    @media (max-width:520px){.card{padding:22px}}
+  </style>
+</head>
+<body>
+  <!-- CONFIG: change these values directly in the file for quick edits -->
+  <script>
+    // ======= CONFIG =======
+    const HER_NAME = "Her Name"; // e.g. "Lina"
+    const TITLE_LINE = `Hey ${HER_NAME} ❤️`;
+    const PROPOSAL_LINE = `Will you be mine?`;
+    const SUB_LINE = `Click yes if you feel the same — my heart is waiting.`;
+    const FINAL_PARAGRAPH = `Every moment with you feels like a little miracle. I love you more than words, and I want to build a lifetime of tiny beautiful mornings with you. Will you marry me?`;
+    const BG_MUSIC = "./romantic-music.mp3"; // optional file (place it next to index.html). Leave empty string to disable auto music UI.
+    const MAIN_COLOR = "#ff5c8a"; // accent color
+    const HERO_IMAGE = ""; // optional path to a hero image
+    // ======================
+
+    // apply accent color to CSS variable
+    document.documentElement.style.setProperty('--main-accent', MAIN_COLOR);
+  </script>
+
+  <div class="hearts" id="hearts"></div>
+
+  <canvas id="fx"></canvas>
+
+  <main class="card" id="card">
+    <h1 id="title">A message for someone special</h1>
+    <p class="lead" id="subtitle">A little surprise — tap your answer below.</p>
+
+    <div id="buttons">
+      <button class="btn" id="yesBtn">Yes 💖</button>
+      <div class="nolook">
+        <button class="btn" id="noBtn">No 😅</button>
+      </div>
+    </div>
+
+    <div class="final" id="finalText"></div>
+    <div class="note" id="noteArea">Tip: Edit the file's CONFIG section at the top to personalize the name, messages, color, or add a music file.</div>
+  </main>
+
+  <!-- optional audio control -->
+  <audio id="bgmusic" src="" preload="auto" loop></audio>
+
+  <script>
+    // small helper: typewriter
+    function typeWriter(el, text, speed = 28, cb) {
+      el.textContent = '';
+      let i = 0;
+      const t = setInterval(()=>{
+        el.textContent += text.charAt(i) || '';
+        i++;
+        if(i > text.length){ clearInterval(t); if(cb) cb(); }
+      }, speed);
+    }
+
+    // place config values into DOM (after CSS var set)
+    const title = document.getElementById('title');
+    const subtitle = document.getElementById('subtitle');
+    const finalText = document.getElementById('finalText');
+    const noteArea = document.getElementById('noteArea');
+    title.textContent = typeof TITLE_LINE === 'string' ? TITLE_LINE : TITLE_LINE;
+    subtitle.textContent = PROPOSAL_LINE + '\n' + SUB_LINE;
+
+    // setup music
+    const audio = document.getElementById('bgmusic');
+    if(BG_MUSIC && BG_MUSIC.trim().length>0) {
+      audio.src = BG_MUSIC;
+      // show a small play hint
+      const p = document.createElement('div');
+      p.style.marginTop='14px'; p.style.opacity=0.9; p.style.fontSize='13px';
+      p.innerHTML = 'Music: enabled — click the heart after saying Yes to play.';
+      noteArea.parentNode.insertBefore(p, noteArea);
+    }
+
+    // hearts background generator (subtle)
+    const heartsContainer = document.getElementById('hearts');
+    function makeHeart(x,y,scale,delay){
+      const el = document.createElement('div'); el.className='heart';
+      el.style.left = (x*100)+'%'; el.style.top = (y*100)+'%';
+      el.style.opacity = Math.random()*0.6 + 0.1;
+      el.style.transform = `translate(-50%,-50%) scale(${scale}) rotate(45deg)`;
+      heartsContainer.appendChild(el);
+      setTimeout(()=>el.remove(), 14000 + (delay||0));
+    }
+    // populate some hearts
+    for(let i=0;i<12;i++) makeHeart(Math.random(), Math.random()*0.8 + 0.05, Math.random()*1.2+0.6, i*300);
+    setInterval(()=> makeHeart(Math.random(), Math.random()*0.75 + 0.05, Math.random()*1.2+0.6), 1800);
+
+    // fireworks / confetti canvas
+    const canvas = document.getElementById('fx');
+    const ctx = canvas.getContext('2d');
+    let W=canvas.width = innerWidth; let H=canvas.height = innerHeight;
+    window.addEventListener('resize', ()=>{W=canvas.width=innerWidth; H=canvas.height=innerHeight});
+
+    // simple particle system for bursts
+    class Particle {
+      constructor(x,y,color,angle,speed,gravity,life){
+        this.x=x; this.y=y; this.vx=Math.cos(angle)*speed; this.vy=Math.sin(angle)*speed; this.color=color; this.alpha=1; this.life=life; this.gravity=gravity;
+      }
+      step(dt){ this.vy += this.gravity*dt; this.x += this.vx*dt*60; this.y += this.vy*dt*60; this.alpha -= 0.015; }
+      draw(ctx){ ctx.globalAlpha = Math.max(this.alpha,0); ctx.fillStyle=this.color; ctx.beginPath(); ctx.arc(this.x,this.y,Math.max(1,Math.abs(this.alpha*3)),0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1; }
+    }
+
+    let particles = [];
+    function explode(x,y,colors,count=80){
+      for(let i=0;i<count;i++){
+        const angle = Math.random()*Math.PI*2;
+        const speed = (Math.random()*4 + 1.2) * (Math.random()*1.4 + 0.6);
+        const color = colors[Math.floor(Math.random()*colors.length)];
+        particles.push(new Particle(x,y,color,angle,speed,0.025 + Math.random()*0.04, 60));
+      }
+    }
+
+    let last = performance.now();
+    function loop(now){
+      const dt = (now - last)/1000; last = now;
+      ctx.clearRect(0,0,W,H);
+      for(let i = particles.length-1;i>=0;i--){
+        const p = particles[i];
+        p.step(dt);
+        p.draw(ctx);
+        if(p.alpha <= 0) particles.splice(i,1);
+      }
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    // small confetti rectangles using DOM for variety
+    function showerConfetti(){
+      const colors = ['#ff6b9a','#ffd166','#8bd3ff','#b8ffb8','#d6a2ff'];
+      for(let i=0;i<50;i++){
+        const el = document.createElement('div'); el.style.position='fixed';
+        el.style.left = (Math.random()*100)+'%'; el.style.top = '-10px'; el.style.width='10px'; el.style.height='16px';
+        el.style.background = colors[Math.floor(Math.random()*colors.length)]; el.style.transform = `rotate(${Math.random()*360}deg)`;
+        el.style.borderRadius='3px'; el.style.zIndex='60'; el.style.pointerEvents='none';
+        el.style.transition = 'transform 2.6s linear, top 2.6s linear, left 2.6s linear, opacity 0.6s ease 2s';
+        document.body.appendChild(el);
+        setTimeout(()=>{ el.style.top = (80 + Math.random()*20) + '%'; el.style.left = (Math.random()*90) + '%'; el.style.transform = `translateY(0) rotate(${Math.random()*360}deg) scale(1.1)`; }, 20 + Math.random()*200);
+        setTimeout(()=>{ el.remove(); }, 3600 + Math.random()*1200);
+      }
+    }
+
+    // handler for Yes
+    document.getElementById('yesBtn').addEventListener('click', ()=>{
+      // small visual
+      explode(W*0.5, H*0.35, ['#ff5c8a','#ffd166','#ff8fb2','#ffffff','#8bd3ff'], 140);
+      showerConfetti();
+      const card = document.getElementById('card');
+      // show final message via typewriter
+      typeWriter(finalText, FINAL_PARAGRAPH, 26, ()=>{
+        // after finished typing, attempt to play music (user gesture triggered by click)
+        if(audio.src){ try{ audio.play(); } catch(e){ console.log('autoplay blocked', e); }}
+      });
+
+      // small heart pulse on title
+      title.style.transform = 'scale(1.02)'; setTimeout(()=>title.style.transform='scale(1)', 700);
+
+      // change subtitle so it's more personal
+      subtitle.textContent = ``;
+
+      // optional: make browser title pretty
+      document.title = `She said YES — ${HER_NAME}!`;
+    });
+
+    // playful No: move away on hover
+    const noBtn = document.getElementById('noBtn');
+    let avoid = 0;
+    noBtn.addEventListener('mouseenter', (e)=>{
+      if(avoid < 6){
+        const rect = noBtn.getBoundingClientRect();
+        const shiftX = (Math.random()*160 - 80);
+        const shiftY = (Math.random()*120 - 60);
+        noBtn.style.transform = `translate(${shiftX}px, ${shiftY}px)`;
+        avoid++;
+      } else {
+        // allow one last click after some tries
+        noBtn.style.transform = 'translate(0,0)';
+      }
+    });
+
+    noBtn.addEventListener('click', ()=>{
+      // if they insist, show a cute nudge and invite re-try
+      finalText.textContent = '';
+      typeWriter(finalText, `Oh no... that's okay — my heart will patiently wait. Try again?`, 26);
+      // create a gentle small burst to keep it playful
+      explode(Math.random()*W*0.9+40, Math.random()*H*0.6+20, ['#ffd166','#ff8fb2','#8bd3ff'], 50);
+      setTimeout(()=>{ noBtn.style.transform='translate(0,0)'; avoid = 0; }, 1600);
+    });
+
+    // small accessibility: allow Enter/Space to choose Yes when focused
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' || e.key === ' ') document.getElementById('yesBtn').click();
+    });
+
+    // tiny pulse on enter hover
+    document.getElementById('yesBtn').addEventListener('mouseenter', ()=>{ document.getElementById('yesBtn').style.transform='scale(1.03)'});
+    document.getElementById('yesBtn').addEventListener('mouseleave', ()=>{ document.getElementById('yesBtn').style.transform='scale(1)'});
+
+    // small tutorial: how to preview and deploy (inserted below as a downloadable note)
+
+  </script>
+
+  <!--
+  Quick publish guide:
+  - GitHub Pages (simple):
+    1) Create a new repository and push this file as index.html on the main branch.
+    2) In Settings > Pages choose branch: main / folder: / (root) and Save.
+    3) Visit https://<your-username>.github.io/<repo>/ after a few minutes.
+
+  - Netlify Drag-and-drop:
+    1) Zip this file (and any music/images) and drag to Netlify Drop.
+    2) Netlify will give you a shareable link.
+
+  - Local preview:
+    1) Save as index.html, open in browser.
+    2) Or run: python -m http.server 8000  and open http://localhost:8000
+  -->
+</body>
 </html>
